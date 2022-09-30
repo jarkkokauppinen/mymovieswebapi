@@ -9,7 +9,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
     policy  =>
     {
-        policy.WithOrigins(System.Environment.GetEnvironmentVariable("CLOUD_URL"));
+        policy.WithOrigins("http://localhost:3000", "https://mymoviesapplication.herokuapp.com");
     });
 });
 
