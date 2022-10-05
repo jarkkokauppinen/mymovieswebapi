@@ -21,21 +21,48 @@ namespace mymovieswebapi
       Db = db;
     }
 
+    public async Task<User> GetInfo(string username)
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"select iduser, password
+      from app_user where username = @username";
+      cmd.Parameters.AddWithValue("username", username);
+      return await ReturnUser(await cmd.ExecuteReaderAsync());
+    }
+
     public async Task<string> CreateAccount()
     {
       using var cmd = Db.Connection.CreateCommand();
-      cmd.CommandText = @"insert into app_user (username, password, firstname, lastname)
+      cmd.CommandText = @"insert into app_user
+      (username, password, firstname, lastname)
       values (@username, @password, @firstname, @lastname)";
       BindParams(cmd);
       try
       {
         await cmd.ExecuteNonQueryAsync();
-        return "OK";
+        return "A new account created";
       }
       catch (System.Exception)
       {   
-        return "not ok";
+        return "The username you entered is already connected to an account";
       } 
+    }
+
+    private async Task<User> ReturnUser(DbDataReader reader)
+    {
+      var user = new User(Db);
+      using (reader)
+      {
+        while (await reader.ReadAsync())
+        {
+          user = new User(Db)
+          {
+            iduser = reader.GetInt32(0),
+            password = reader.GetString(1)
+          };
+        }
+      }
+      return user;
     }
 
     private void BindParams(NpgsqlCommand cmd)

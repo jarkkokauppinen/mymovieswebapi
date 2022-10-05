@@ -7,6 +7,7 @@ namespace mymovieswebapi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+
 public class MovieController : ControllerBase
 {
   public MovieController(Database db) {

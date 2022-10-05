@@ -7,10 +7,31 @@ namespace mymovieswebapi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+
 public class UserController : ControllerBase
 {
   public UserController(Database db) {
     Db = db;
+  }
+
+  [HttpGet()]
+  public async Task<IActionResult> Get(string username, string password)
+  {
+    await Db.Connection.OpenAsync();
+    var query = new User(Db);
+    var info = await query.GetInfo(username);
+
+    if (info.iduser == 0)
+    {
+      return new OkObjectResult("The username you entered is not connected to an account");
+    }
+
+    if (BCrypt.Net.BCrypt.Verify(password, info.password))
+    {
+      return new OkObjectResult(info.iduser);
+    }
+
+    return new OkObjectResult("The password you entered is incorrect");
   }
 
   [HttpPost()]
@@ -20,7 +41,6 @@ public class UserController : ControllerBase
     body.password = BCrypt.Net.BCrypt.HashPassword(body.password);
     body.Db = Db;
     string result = await body.CreateAccount();
-    if (result == "not ok") return new ConflictObjectResult(result);
     return new OkObjectResult(result);
   }
 

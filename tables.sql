@@ -1,6 +1,6 @@
 CREATE TABLE movie (
 	idmovie SERIAL PRIMARY KEY,
-	title varchar(45) DEFAULT NULL,
+	title varchar(100) DEFAULT NULL,
   year char(4) DEFAULT NULL,
   description varchar(255) DEFAULT NULL,
   image_url varchar(255) DEFAULT NULL,
@@ -50,4 +50,11 @@ CREATE TABLE app_user (
   password varchar(255) NOT NULL,
   firstname varchar(45) NOT NULL,
   lastname varchar(45) NOT NULL
+);
+
+CREATE TABLE quote (
+	idquote SERIAL PRIMARY KEY,
+  quote varchar(255) NOT NULL,
+  movie varchar(45) NOT NULL,
+  year char(4) NOT NULL
 );
