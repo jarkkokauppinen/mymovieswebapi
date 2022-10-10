@@ -10,6 +10,7 @@ namespace mymovieswebapi
   {
     public string idrating { get; set; }
     public float average { get; set; }
+    public int sum { get; set; }
     public int raters { get; set; }
     public int rating { get; set; }
     public int iduser { get; set; }
@@ -26,7 +27,7 @@ namespace mymovieswebapi
     public async Task<Rating> GetRatings(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
-      cmd.CommandText = @"select round(avg(rating), 1), count(rating)
+      cmd.CommandText = @"select round(avg(rating), 1), sum(rating), count(rating)
       from rating where idrating in (select idrating from
       movierating where idmovie = @id)";
       cmd.Parameters.AddWithValue("id", id);
@@ -65,6 +66,7 @@ namespace mymovieswebapi
           ratings = new Rating(Db)
           {
             average = 0,
+            sum = 0,
             raters = 0
           };
 
@@ -73,7 +75,11 @@ namespace mymovieswebapi
           }
 
           if (!reader.IsDBNull(1)) {
-            ratings.raters = reader.GetInt32(1);
+            ratings.sum = reader.GetInt32(1);
+          }
+
+          if (!reader.IsDBNull(2)) {
+            ratings.raters = reader.GetInt32(2);
           }
         }
       }

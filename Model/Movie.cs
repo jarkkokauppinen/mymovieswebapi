@@ -42,7 +42,7 @@ namespace mymovieswebapi
     public async Task<Movie> GetById(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
-      cmd.CommandText = @"select title, year, description, image,
+      cmd.CommandText = @"select idmovie, title, year, description, image,
       movie.iduser, concat(app_user.firstname, ' ', app_user.lastname) as user,
       concat(director.firstname, ' ', director.lastname) as director,
       genre from movie inner join director on director.iddirector = movie.iddirector
@@ -118,14 +118,15 @@ namespace mymovieswebapi
         {
           movie = new Movie(Db)
           {
-            title = reader.GetString(0),
+            idmovie = reader.GetString(0),
+            title = reader.GetString(1),
             year = (reader["year"] as string) ?? "year unknown",
             description = (reader["description"] as string) ?? "no description",
             image = (reader["image"] as string) ?? "no image",
-            iduser = reader.GetInt32(4),
-            user = reader.GetString(5),
-            director = reader.GetString(6),
-            genre = reader.GetString(7)
+            iduser = reader.GetInt32(5),
+            user = reader.GetString(6),
+            director = reader.GetString(7),
+            genre = reader.GetString(8)
           };
         }
       }
