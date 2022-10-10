@@ -23,5 +23,13 @@ public class MovieRatingController : ControllerBase
     return new OkObjectResult(result);
   }
 
+  [HttpDelete("{id}")]
+  public async Task<IActionResult> Delete(string id)
+  {
+    await Db.Connection.OpenAsync();
+    var query = new MovieRating(Db);
+    return new OkObjectResult(await query.DeleteRatings(id));
+  }
+
   public Database Db { get; set; }
 }

@@ -8,21 +8,22 @@ namespace mymovieswebapi
 {
   public class Rating
   {
+    public string idrating { get; set; }
     public float average { get; set; }
     public int raters { get; set; }
     public int rating { get; set; }
     public int iduser { get; set; }
 
-    public Rating() {}
-
     internal Database Db { get; set; }
+
+    public Rating() {}
 
     internal Rating(Database db)
     {
       Db = db;
     }
 
-    public async Task<Rating> GetRatings(int id)
+    public async Task<Rating> GetRatings(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"select round(avg(rating), 1), count(rating)
@@ -36,17 +37,22 @@ namespace mymovieswebapi
     {
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"insert into rating
-      (rating, iduser) values (@rating, @iduser)";
-      BindParams(cmd);
-      try
-      {
-        await cmd.ExecuteNonQueryAsync();
-        return "Success";
-      }
-      catch (System.Exception)
-      {   
-        return "Something went wrong";
-      } 
+      (idrating, rating, iduser) values (@idrating, @rating, @iduser)";
+      cmd.Parameters.AddWithValue("idrating", idrating);
+      cmd.Parameters.AddWithValue("rating", rating);
+      cmd.Parameters.AddWithValue("iduser", iduser);
+      await cmd.ExecuteNonQueryAsync();
+      return "Success";
+    }
+
+    public async Task<string> DeleteRatings(string id)
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"delete from rating where idrating in
+      (select idrating from movierating where idmovie = @id)";
+      cmd.Parameters.AddWithValue("id", id);
+      await cmd.ExecuteNonQueryAsync();
+      return "Deleted";
     }
 
     private async Task<Rating> Return(DbDataReader reader)
@@ -72,12 +78,6 @@ namespace mymovieswebapi
         }
       }
       return ratings;
-    }
-
-    private void BindParams(NpgsqlCommand cmd)
-    {
-      cmd.Parameters.AddWithValue("rating", rating);
-      cmd.Parameters.AddWithValue("iduser", iduser);
     }
   }
 }

@@ -9,12 +9,12 @@ namespace mymovieswebapi
   public class MovieRating
   {
 
-    public int idmovie { get; set; }
-    public int idrating {get; set; }
-
-    public MovieRating() {}
+    public string idmovie { get; set; }
+    public string idrating { get; set; }
 
     internal Database Db { get; set; }
+
+    public MovieRating() {}
 
     internal MovieRating(Database db)
     {
@@ -26,22 +26,20 @@ namespace mymovieswebapi
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"insert into movierating
       (idmovie, idrating) values (@idmovie, @idrating)";
-      BindParams(cmd);
-      try
-      {
-        await cmd.ExecuteNonQueryAsync();
-        return "Success";
-      }
-      catch (System.Exception)
-      {   
-        return "Something went wrong";
-      } 
-    }
-
-    private void BindParams(NpgsqlCommand cmd)
-    {
       cmd.Parameters.AddWithValue("idmovie", idmovie);
       cmd.Parameters.AddWithValue("idrating", idrating);
+      await cmd.ExecuteNonQueryAsync();
+      return "Success";
+    }
+
+    public async Task<string> DeleteRatings(string id)
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"delete from movierating where idmovie = @id";
+      cmd.Parameters.AddWithValue("id", id);
+      await cmd.ExecuteNonQueryAsync();
+      await cmd.ExecuteNonQueryAsync();
+      return "Deleted";
     }
   }
 }

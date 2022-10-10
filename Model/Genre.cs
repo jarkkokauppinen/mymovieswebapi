@@ -16,7 +16,7 @@ namespace mymovieswebapi
       Db = db;
     }
 
-    public async Task<Genre> GetGenre(int id)
+    public async Task<Genre> GetGenre(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"select genre from genre where idgenre =

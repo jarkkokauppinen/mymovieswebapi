@@ -14,7 +14,7 @@ public class UserController : ControllerBase
     Db = db;
   }
 
-  [HttpGet()]
+  [HttpGet("{username}/{password}")]
   public async Task<IActionResult> Get(string username, string password)
   {
     await Db.Connection.OpenAsync();

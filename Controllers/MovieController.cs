@@ -24,7 +24,7 @@ public class MovieController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  public async Task<IActionResult> GetOne(int id)
+  public async Task<IActionResult> GetOne(string id)
   {
     await Db.Connection.OpenAsync();
     var query = new Movie(Db);
@@ -32,5 +32,43 @@ public class MovieController : ControllerBase
     return new OkObjectResult(result);
   }
 
-  public Database Db { get; set; }
+  [HttpPost()]
+  public async Task<IActionResult> NewMovie([FromBody] Movie body)
+  {
+    await Db.Connection.OpenAsync();
+    body.Db = Db;
+    string result = await body.PostMovie();
+    return new OkObjectResult(result);
+  }
+
+  [HttpPut()]
+  public async Task<IActionResult> Update([FromBody] Movie body)
+  {
+    await Db.Connection.OpenAsync();
+    
+    var movie = new Movie(Db)
+    {
+      idmovie = body.idmovie,
+      title = body.title,
+      year = body.year,
+      description = body.description,
+      image = body.image,
+      iddirector = body.iddirector,
+      idgenre = body.idgenre,
+      iduser = body.iduser
+    };
+
+    await movie.UpdateMovie();
+    return new OkObjectResult(movie);
+  }
+
+  [HttpDelete()]
+  public async Task<IActionResult> Delete(string id)
+  {
+    await Db.Connection.OpenAsync();
+    var query = new Movie(Db);
+    return new OkObjectResult(await query.DeleteMovie(id));
+  }
+
+   public Database Db { get; set; }
 }

@@ -3,15 +3,15 @@ using Npgsql;
 
 namespace mymovieswebapi
 {
-    public class Database : IDisposable
+  public class Database : IDisposable
+  {
+    public NpgsqlConnection Connection { get; }
+
+    public Database(string connectionString)
     {
-        public NpgsqlConnection Connection { get; }
-
-        public Database(string connectionString)
-        {
-            Connection = new NpgsqlConnection(System.Environment.GetEnvironmentVariable("MY_DATABASE"));
-        }
-
-        public void Dispose() => Connection.Dispose();
+      Connection = new NpgsqlConnection(System.Environment.GetEnvironmentVariable("MY_DATABASE"));
     }
+
+    public void Dispose() => Connection.Dispose();
+  }
 }

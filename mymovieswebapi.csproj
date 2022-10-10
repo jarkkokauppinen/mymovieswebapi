@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="bcrypt.net-next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="npgsql" Version="6.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>

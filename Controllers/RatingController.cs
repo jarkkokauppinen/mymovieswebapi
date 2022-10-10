@@ -15,7 +15,7 @@ public class RatingController : ControllerBase
   }
 
   [HttpGet()]
-  public async Task<IActionResult> Get(int id)
+  public async Task<IActionResult> Get(string id)
   {
     await Db.Connection.OpenAsync();
     var query = new Rating(Db);
@@ -29,6 +29,14 @@ public class RatingController : ControllerBase
     body.Db = Db;
     string result = await body.SaveRatings();
     return new OkObjectResult(result);
+  }
+
+  [HttpDelete()]
+  public async Task<IActionResult> Delete(string id)
+  {
+    await Db.Connection.OpenAsync();
+    var query = new Rating(Db);
+    return new OkObjectResult(await query.DeleteRatings(id));
   }
 
   public Database Db { get; set; }

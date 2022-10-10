@@ -15,7 +15,7 @@ public class GenreController : ControllerBase
   }
 
   [HttpGet()]
-  public async Task<IActionResult> Get(int id)
+  public async Task<IActionResult> Get(string id)
   {
     await Db.Connection.OpenAsync();
     var query = new Genre(Db);

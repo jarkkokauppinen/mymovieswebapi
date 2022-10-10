@@ -2,19 +2,27 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace mymovieswebapi
 {
   public class Movie
   {
-    public int idmovie { get; set; }
+    public string idmovie { get; set; }
     public string title { get; set; }
     public string year { get; set; }
     public string description { get; set; }
-    public string image_url { get; set; }
+    public string image { get; set; }
+    public string iddirector { get; set; }
+    public int idgenre { get; set; }
+    public int iduser { get; set; }
     public string user { get; set; }
+    public string director { get; set; }
+    public string genre { get; set; }
 
     internal Database Db { get; set; }
+
+    public Movie() {}
 
     internal Movie(Database db)
     {
@@ -31,14 +39,56 @@ namespace mymovieswebapi
       return await ReturnSearched(await cmd.ExecuteReaderAsync());
     }
 
-    public async Task<Movie> GetById(int id)
+    public async Task<Movie> GetById(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
-      cmd.CommandText = @"select title, year, description, image_url,
-      concat(firstname, ' ', lastname) as user from movie inner join app_user on
-      movie.iduser = app_user.iduser where idmovie = @id";
+      cmd.CommandText = @"select title, year, description, image,
+      movie.iduser, concat(app_user.firstname, ' ', app_user.lastname) as user,
+      concat(director.firstname, ' ', director.lastname) as director,
+      genre from movie inner join director on director.iddirector = movie.iddirector
+      inner join genre on genre.idgenre = movie.idgenre inner join app_user on
+      app_user.iduser = movie.iduser where idmovie = @id";
       cmd.Parameters.AddWithValue("id", id);
       return await ReturnMovie(await cmd.ExecuteReaderAsync());
+    }
+
+    public async Task<string> PostMovie()
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"insert into movie
+      (idmovie, title, year, description, image, iddirector, idgenre, iduser)
+      values (@idmovie, @title, @year, @description, @image, @iddirector,
+      @idgenre, @iduser)";
+      BindParams(cmd);
+      try
+      {
+        await cmd.ExecuteNonQueryAsync();
+        return "Movie added";
+      }
+      catch (System.Exception)
+      {   
+        return "A movie with that title already exists";
+      } 
+    }
+
+    public async Task UpdateMovie()
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"update movie set idmovie = @idmovie, title = @title,
+      year = @year, description = @description, image = @image,
+      iddirector = @iddirector, idgenre = @idgenre, iduser = @iduser
+      where idmovie = @idmovie";
+      BindParams(cmd);
+      await cmd.ExecuteNonQueryAsync();
+    }
+
+    public async Task<string> DeleteMovie(string id)
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"delete from movie where idmovie = @id";
+      cmd.Parameters.AddWithValue("id", id);
+      await cmd.ExecuteNonQueryAsync();
+      return "Deleted";
     }
 
     private async Task<List<Movie>> ReturnSearched(DbDataReader reader)
@@ -50,7 +100,7 @@ namespace mymovieswebapi
         {
           var movie = new Movie(Db)
           {
-            idmovie = reader.GetInt32(0),
+            idmovie = reader.GetString(0),
             title = reader.GetString(1),
           };
         list.Add(movie);
@@ -71,12 +121,27 @@ namespace mymovieswebapi
             title = reader.GetString(0),
             year = (reader["year"] as string) ?? "year unknown",
             description = (reader["description"] as string) ?? "no description",
-            image_url = (reader["image_url"] as string) ?? "no image",
-            user = reader.GetString(4)
+            image = (reader["image"] as string) ?? "no image",
+            iduser = reader.GetInt32(4),
+            user = reader.GetString(5),
+            director = reader.GetString(6),
+            genre = reader.GetString(7)
           };
         }
       }
       return movie;
+    }
+
+    private void BindParams(NpgsqlCommand cmd)
+    {
+      cmd.Parameters.AddWithValue("idmovie", idmovie);
+      cmd.Parameters.AddWithValue("title", title);
+      cmd.Parameters.AddWithValue("year", year);
+      cmd.Parameters.AddWithValue("description", description);
+      cmd.Parameters.AddWithValue("image", image);
+      cmd.Parameters.AddWithValue("iddirector", iddirector);
+      cmd.Parameters.AddWithValue("idgenre", idgenre);
+      cmd.Parameters.AddWithValue("iduser", iduser);
     }
   }
 }

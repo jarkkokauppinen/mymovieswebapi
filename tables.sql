@@ -1,16 +1,16 @@
 CREATE TABLE movie (
-	idmovie SERIAL PRIMARY KEY,
-	title varchar(100) DEFAULT NULL,
-  year char(4) DEFAULT NULL,
-  description varchar(255) DEFAULT NULL,
-  image_url varchar(255) DEFAULT NULL,
-  iddirector int DEFAULT NULL,
-  idgenre int DEFAULT NULL,
-  iduser int NOT NULL
+	idmovie varchar(100) PRIMARY KEY,
+	title varchar(100) UNIQUE NOT NULL,
+	year char(4) DEFAULT NULL,
+	description varchar(255) DEFAULT NULL,
+	image varchar(255) DEFAULT NULL,
+	iddirector varchar DEFAULT NULL,
+	idgenre int DEFAULT NULL,
+	iduser int NOT NULL
 );
 
 CREATE TABLE director (
-	iddirector SERIAL PRIMARY KEY,
+	iddirector varchar(100) PRIMARY KEY,
 	firstname varchar(45) NOT NULL,
 	lastname varchar(45) NOT NULL
 );
@@ -21,40 +21,40 @@ CREATE TABLE genre (
 );
 
 CREATE TABLE actor (
-	idactor SERIAL PRIMARY KEY,
+	idactor varchar(100) PRIMARY KEY,
 	firstname varchar(45) NOT NULL,
-  lastname varchar(45) NOT NULL
+	lastname varchar(45) NOT NULL
 );
 
 CREATE TABLE movieactor (
 	idmovieactor SERIAL PRIMARY KEY,
-	idmovie int NOT NULL,
-  idactor int NOT NULL
+	idmovie varchar NOT NULL,
+	idactor varchar NOT NULL
 );
 
 CREATE TABLE rating (
-	idrating SERIAL PRIMARY KEY,
+	idrating varchar(100) PRIMARY KEY,
 	rating int NOT NULL,
-  iduser int NOT NULL
+	iduser int NOT NULL
 );
 
 CREATE TABLE movierating (
 	idmovierating SERIAL PRIMARY KEY,
-	idmovie int NOT NULL,
-  idrating int NOT NULL
+	idmovie varchar NOT NULL,
+	idrating varchar NOT NULL
 );
 
 CREATE TABLE app_user (
 	iduser SERIAL PRIMARY KEY,
 	username varchar(45) UNIQUE NOT NULL,
-  password varchar(255) NOT NULL,
-  firstname varchar(45) NOT NULL,
-  lastname varchar(45) NOT NULL
+	password varchar(255) NOT NULL,
+	firstname varchar(45) NOT NULL,
+	lastname varchar(45) NOT NULL
 );
 
 CREATE TABLE quote (
 	idquote SERIAL PRIMARY KEY,
-  quote varchar(255) NOT NULL,
-  movie varchar(45) NOT NULL,
-  year char(4) NOT NULL
+	quote varchar(255) NOT NULL,
+	movie varchar(45) NOT NULL,
+	year char(4) NOT NULL
 );
