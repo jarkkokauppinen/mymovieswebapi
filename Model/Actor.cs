@@ -9,7 +9,6 @@ namespace mymovieswebapi
   public class Actor : Person
   {
     public string idactor { get; set; }
-    public string actor { get; set; }
 
     internal Database Db { get; set; }
 
@@ -23,7 +22,7 @@ namespace mymovieswebapi
     public async Task<List<Actor>> GetActors(string id)
     {
       using var cmd = Db.Connection.CreateCommand();
-      cmd.CommandText = @"select concat(firstname, ' ', lastname) from actor where
+      cmd.CommandText = @"select firstname, lastname from actor where
       idactor in (select idactor from movieactor where idmovie = @id)";
       cmd.Parameters.AddWithValue("id", id);
       return await Return(await cmd.ExecuteReaderAsync());
@@ -62,7 +61,8 @@ namespace mymovieswebapi
         {
           var actor = new Actor(Db)
           {
-            actor = reader.GetString(0)
+            firstname = reader.GetString(0),
+            lastname = reader.GetString(1)
           };
           list.Add(actor);
         }

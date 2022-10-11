@@ -17,7 +17,8 @@ namespace mymovieswebapi
     public int idgenre { get; set; }
     public int iduser { get; set; }
     public string user { get; set; }
-    public string director { get; set; }
+    public string director_firstname { get; set; }
+    public string director_lastname { get; set; }
     public string genre { get; set; }
 
     internal Database Db { get; set; }
@@ -44,10 +45,10 @@ namespace mymovieswebapi
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"select idmovie, title, year, description, image,
       movie.iduser, concat(app_user.firstname, ' ', app_user.lastname) as user,
-      concat(director.firstname, ' ', director.lastname) as director,
-      genre from movie inner join director on director.iddirector = movie.iddirector
-      inner join genre on genre.idgenre = movie.idgenre inner join app_user on
-      app_user.iduser = movie.iduser where idmovie = @id";
+      director.firstname, director.lastname, genre from movie
+      inner join director on director.iddirector = movie.iddirector
+      inner join genre on genre.idgenre = movie.idgenre
+      inner join app_user on app_user.iduser = movie.iduser where idmovie = @id";
       cmd.Parameters.AddWithValue("id", id);
       return await ReturnMovie(await cmd.ExecuteReaderAsync());
     }
@@ -125,8 +126,9 @@ namespace mymovieswebapi
             image = (reader["image"] as string) ?? "no image",
             iduser = reader.GetInt32(5),
             user = reader.GetString(6),
-            director = reader.GetString(7),
-            genre = reader.GetString(8)
+            director_firstname = reader.GetString(7),
+            director_lastname = reader.GetString(8),
+            genre = reader.GetString(9)
           };
         }
       }
