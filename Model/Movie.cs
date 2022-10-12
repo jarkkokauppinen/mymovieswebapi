@@ -45,7 +45,7 @@ namespace mymovieswebapi
       using var cmd = Db.Connection.CreateCommand();
       cmd.CommandText = @"select idmovie, title, year, description, image,
       movie.iduser, concat(app_user.firstname, ' ', app_user.lastname) as user,
-      director.firstname, director.lastname, genre from movie
+      movie.iddirector, director.firstname, director.lastname, genre from movie
       inner join director on director.iddirector = movie.iddirector
       inner join genre on genre.idgenre = movie.idgenre
       inner join app_user on app_user.iduser = movie.iduser where idmovie = @id";
@@ -121,14 +121,15 @@ namespace mymovieswebapi
           {
             idmovie = reader.GetString(0),
             title = reader.GetString(1),
-            year = (reader["year"] as string) ?? "year unknown",
-            description = (reader["description"] as string) ?? "no description",
-            image = (reader["image"] as string) ?? "no image",
+            year = reader.GetString(2),
+            description = reader.GetString(3),
+            image = reader.GetString(4),
             iduser = reader.GetInt32(5),
             user = reader.GetString(6),
-            director_firstname = reader.GetString(7),
-            director_lastname = reader.GetString(8),
-            genre = reader.GetString(9)
+            iddirector = reader.GetString(7),
+            director_firstname = reader.GetString(8),
+            director_lastname = reader.GetString(9),
+            genre = reader.GetString(10)
           };
         }
       }

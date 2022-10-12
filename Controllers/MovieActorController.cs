@@ -14,13 +14,29 @@ public class MovieActorController : ControllerBase
     Db = db;
   }
 
+  [HttpGet()]
+  public async Task<IActionResult> Get(string idmovie, string idactor)
+  {
+    await Db.Connection.OpenAsync();
+    var query = new MovieActor(Db);
+    return new OkObjectResult(await query.GetRow(idmovie, idactor));
+  }
+
   [HttpPost()]
   public async Task<IActionResult> Post([FromBody] MovieActor body)
   {
     await Db.Connection.OpenAsync();
-    body.Db = Db;
-    string result = await body.SaveActors();
-    return new OkObjectResult(result);
+    var query = new MovieActor(Db);
+    var row = await query.GetRow(body.idmovie, body.idactor);
+
+    if (row.idmovieactor == 0)
+    {
+      body.Db = Db;
+      string result = await body.SaveActors();
+      return new OkObjectResult(result);
+    }
+
+    return new OkObjectResult("This row already exist");
   }
 
   [HttpDelete("{id}")]

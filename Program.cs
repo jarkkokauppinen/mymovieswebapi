@@ -1,4 +1,6 @@
 using mymovieswebapi;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<FormOptions>(o =>
+{
+  o.ValueLengthLimit = int.MaxValue;
+  o.MultipartBodyLengthLimit = int.MaxValue;
+  o.MemoryBufferThreshold = int.MaxValue;
+});
 
 builder.Services.AddTransient(_ => new Database(builder.Configuration.GetConnectionString("DefaultConnection"))); 
 
@@ -28,6 +37,13 @@ app.UseCors(builder =>
 });
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+  FileProvider = new PhysicalFileProvider(
+    Path.Combine(builder.Environment.ContentRootPath, "wwwroot/images")),
+  RequestPath = "/images"
+});
 
 app.UseAuthorization();
 

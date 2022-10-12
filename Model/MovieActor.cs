@@ -8,7 +8,7 @@ namespace mymovieswebapi
 {
   public class MovieActor
   {
-
+    public int idmovieactor { get; set; }
     public string idmovie { get; set; }
     public string idactor {get; set; }
 
@@ -19,6 +19,16 @@ namespace mymovieswebapi
     internal MovieActor(Database db)
     {
       Db = db;
+    }
+
+    public async Task<MovieActor> GetRow(string idmovie, string idactor)
+    {
+      using var cmd = Db.Connection.CreateCommand();
+      cmd.CommandText = @"select idmovieactor from movieactor
+      where idmovie = @idmovie and idactor = @idactor";
+      cmd.Parameters.AddWithValue("idmovie", idmovie);
+      cmd.Parameters.AddWithValue("idactor", idactor);
+      return await ReturnRow(await cmd.ExecuteReaderAsync());
     }
 
     public async Task<string> SaveActors()
@@ -38,6 +48,22 @@ namespace mymovieswebapi
       cmd.Parameters.AddWithValue("id", id);
       await cmd.ExecuteNonQueryAsync();
       return "Deleted";
+    }
+
+    private async Task<MovieActor> ReturnRow(DbDataReader reader)
+    {
+      var row = new MovieActor(Db);
+      using (reader)
+      {
+        while (await reader.ReadAsync())
+        {
+          row = new MovieActor(Db)
+          {
+            idmovieactor = reader.GetInt32(0)
+          };
+        }
+      }
+      return row;
     }
 
     private void BindParams(NpgsqlCommand cmd)
