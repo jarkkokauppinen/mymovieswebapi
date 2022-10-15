@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class QuoteController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public QuoteController(Database db) {
     Db = db;
   }
@@ -21,6 +23,4 @@ public class QuoteController : ControllerBase
     var query = new Quote(Db);
     return new OkObjectResult(await query.GetQuote());
   }
-
-  public Database Db { get; set; }
 }

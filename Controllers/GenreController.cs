@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class GenreController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public GenreController(Database db) {
     Db = db;
   }
@@ -21,6 +23,4 @@ public class GenreController : ControllerBase
     var query = new Genre(Db);
     return new OkObjectResult(await query.GetGenre(id));
   }
-
-  public Database Db { get; set; }
 }

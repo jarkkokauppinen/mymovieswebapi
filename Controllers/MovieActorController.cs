@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class MovieActorController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public MovieActorController(Database db) {
     Db = db;
   }
@@ -46,6 +48,4 @@ public class MovieActorController : ControllerBase
     var query = new MovieActor(Db);
     return new OkObjectResult(await query.DeleteRows(id));
   }
-
-  public Database Db { get; set; }
 }

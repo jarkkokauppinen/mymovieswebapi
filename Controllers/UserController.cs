@@ -2,6 +2,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace mymovieswebapi.Controllers;
 
@@ -10,8 +14,35 @@ namespace mymovieswebapi.Controllers;
 
 public class UserController : ControllerBase
 {
-  public UserController(Database db) {
+  public Database Db { get; set; }
+  
+  private readonly IConfiguration _configuration;
+
+  public UserController(Database db, IConfiguration configuration) {
     Db = db;
+    _configuration = configuration;
+  }
+
+  protected string CreateToken(string username)
+  {
+    List<Claim> claims = new List<Claim>
+    {
+      new Claim(ClaimTypes.Name, username)
+    };
+
+    var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+      _configuration.GetSection("AppSettings:Token").Value));
+
+    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+    var token = new JwtSecurityToken(
+      claims: claims,
+      expires: DateTime.Now.AddDays(1),
+      signingCredentials: creds);
+
+    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+    return jwt;
   }
 
   [HttpGet("{username}/{password}")]
@@ -19,19 +50,27 @@ public class UserController : ControllerBase
   {
     await Db.Connection.OpenAsync();
     var query = new User(Db);
-    var info = await query.GetInfo(username);
+    var user = await query.GetInfo(username);
 
-    if (info.iduser == 0)
+    Token token = new Token();
+
+    if (user.iduser == 0)
     {
-      return new OkObjectResult("The username you entered is not connected to an account");
+      token.error = "The username you entered is not connected to an account";
+      return Ok(token);
     }
 
-    if (BCrypt.Net.BCrypt.Verify(password, info.password))
+    if (BCrypt.Net.BCrypt.Verify(password, user.password))
     {
-      return new OkObjectResult(info.iduser);
+      token.userID = user.iduser;
+      token.token = CreateToken(username);
+      token.error = "No error";
+
+      return Ok(token);
     }
 
-    return new OkObjectResult("The password you entered is incorrect");
+    token.error = "The password you entered is incorrect";
+    return Ok(token);
   }
 
   [HttpPost()]
@@ -43,6 +82,4 @@ public class UserController : ControllerBase
     string result = await body.CreateAccount();
     return new OkObjectResult(result);
   }
-
-  public Database Db { get; set; }
 }

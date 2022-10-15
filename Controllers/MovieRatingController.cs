@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class MovieRatingController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public MovieRatingController(Database db) {
     Db = db;
   }
@@ -45,6 +47,4 @@ public class MovieRatingController : ControllerBase
     var query = new MovieRating(Db);
     return new OkObjectResult(await query.DeleteRatings(id));
   }
-
-  public Database Db { get; set; }
 }

@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class RatingController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public RatingController(Database db) {
     Db = db;
   }
@@ -27,8 +29,7 @@ public class RatingController : ControllerBase
   {
     await Db.Connection.OpenAsync();
     body.Db = Db;
-    string result = await body.SaveRatings();
-    return new OkObjectResult(result);
+    return new OkObjectResult(await body.SaveRatings());
   }
 
   [HttpDelete()]
@@ -38,6 +39,4 @@ public class RatingController : ControllerBase
     var query = new Rating(Db);
     return new OkObjectResult(await query.DeleteRatings(id));
   }
-
-  public Database Db { get; set; }
 }

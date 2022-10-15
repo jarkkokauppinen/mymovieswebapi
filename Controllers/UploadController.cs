@@ -23,6 +23,7 @@ public class UploadController : ControllerBase
         var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
         var fullPath = Path.Combine("wwwroot/images", fileName);
         var dbPath = Path.Combine("wwwroot/images", fileName);
+        
         using (var stream = new FileStream(fullPath, FileMode.Create))
         {
           file.CopyTo(stream);
@@ -30,7 +31,8 @@ public class UploadController : ControllerBase
 
         return Ok(new { dbPath });
       }
-      else return BadRequest();
+
+      return BadRequest();
     }
     catch (Exception ex)
     {

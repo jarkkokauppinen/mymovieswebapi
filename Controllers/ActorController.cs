@@ -10,6 +10,8 @@ namespace mymovieswebapi.Controllers;
 
 public class ActorController : ControllerBase
 {
+  public Database Db { get; set; }
+  
   public ActorController(Database db) {
     Db = db;
   }
@@ -46,6 +48,4 @@ public class ActorController : ControllerBase
 
     return new OkObjectResult(actor.idactor);
   }
-
-  public Database Db { get; set; }
 }
