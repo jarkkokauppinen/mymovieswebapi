@@ -16,6 +16,10 @@ If you don't want to create a new account, feel free to use these credentials :
 Note that when Heroku dyno doesn't receive any traffic in 30 minute,
 the dyno goes to sleep, and it may take a while to wake.
 
+### `JSON web token`
+
+When logged in, JSON web token is set to local storage.
+
 ## ER model
 
 <img src='database_diagram.png'></img>
