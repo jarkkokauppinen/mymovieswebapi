@@ -13,6 +13,9 @@ If you don't want to create a new account, feel free to use these credentials :
   <li>password = password</li>
 </ul>
 
+Note that when Heroku dyno doesn't receive any traffic in 30 minute,
+the dyno goes to sleep, and it may take a while to wake.
+
 ## ER model
 
 <img src='database_diagram.png'></img>
